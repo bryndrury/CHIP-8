@@ -1,6 +1,6 @@
 CC = clang++
-CFLAGS = -Wall -Werror -Wextra -std=c++2a -g $(shell sdl2-config --cflags)
-# CFLAGS = -O3 -std=c++2a $(shell sdl2-config --cflags)
+# CFLAGS = -Wall -Werror -Wextra -std=c++2a -g $(shell sdl2-config --cflags)
+CFLAGS = -O3 -w -std=c++2a $(shell sdl2-config --cflags)
 LDFLAGS = $(shell sdl2-config --libs)
 TARGET = chip8
 BUILD_DIR = build

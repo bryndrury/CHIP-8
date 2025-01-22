@@ -102,3 +102,44 @@ void SDLManager::renderDisplayBuffer()
         SDL_RenderFillRect(renderer, &rect);
     }
 }
+
+void SDLManager::playBeep()
+{
+    const int amplitude = 28000;    // Max amplitude
+    const int frequency = 440;      // A4
+    const int sample_rate = 44100;  // 44.1kHz
+    const int duration = 16.66;     // 1/60th = 16.66ms (60Hz)
+
+    SDL_AudioSpec audio_spec;       // 
+    Uint32 wav_length;              // 
+
+    // Generate the sine wave sample
+    audio_spec.freq = sample_rate;
+    audio_spec.format = AUDIO_S16SYS;
+    audio_spec.channels = 1;
+    audio_spec.samples = 2048;
+    audio_spec.callback = nullptr;
+
+    int sample_count = (sample_rate * duration) / 1000;
+    std::array<Uint8, (44100 * 16) / 1000 * sizeof(Sint16)> wav_buffer;
+    for (int i = 0; i < sample_count; i++)
+    {
+        Sint16 sample = (Sint16)(amplitude * sin(2 * M_PI * frequency * i / sample_rate));
+        wav_buffer[i * sizeof(Sint16)] = sample & 0xFF;
+        wav_buffer[i * sizeof(Sint16) + 1] = (sample >> 8) & 0xFF;
+    }
+    wav_length = sample_count * sizeof(Sint16);
+
+    if (SDL_OpenAudio(&audio_spec, nullptr) < 0)
+    {
+        std::cerr << "SDL_OpenAudio Error: " << SDL_GetError() << std::endl;
+        return;
+    }
+
+    SDL_QueueAudio(1, wav_buffer.data(), wav_length);
+    SDL_PauseAudio(0);
+
+    // SDL_Delay(duration);
+
+    SDL_CloseAudio();
+}

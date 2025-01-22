@@ -4,6 +4,7 @@
 #define SDL_MANAGER_HPP
 
 #include <iostream>
+#include <cmath>
 
 #include "SDL.h"
 
@@ -13,12 +14,14 @@ public:
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Event event;
+    Uint32 frameTime;
 
     SDLManager();
     ~SDLManager();
 
     void passDisplayBuffer(const std::array<uint8_t, 64 * 32> &buffer);
     void renderDisplayBuffer();
+    void playBeep();
 
 private:
     bool init();

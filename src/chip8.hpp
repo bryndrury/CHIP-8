@@ -8,7 +8,6 @@
 #include <string>
 #include <random>
 
-#define FONTSET_START_ADDRESS 0x50
 
 class Chip8
 {
@@ -22,6 +21,21 @@ public:
         PAUSED
     };
 
+    // 2048 bytes for display memory
+    std::array<uint8_t, 64 * 32> display_buffer = {};   // Graphics buffer
+    std::array<uint8_t, 16> keypad = {};                // Keypad buffer
+    bool drawFlag = false;                              // Flag to indicate the screen state
+    bool soundFlag = false;                             // Flag to indicate to make a sound.
+
+    State currentState = State::RUNNING;
+    bool awaitingKeyPress = false;
+
+    bool LoadROM(const std::string &filename);
+    void EmulateCycle();
+
+private:
+
+    #define FONTSET_START_ADDRESS 0x50
     std::array<uint8_t, 80> fontset = 
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -42,30 +56,17 @@ public:
         0xF0, 0x80, 0xF0, 0x80, 0x80, // F
     };
 
-    // 2048 bytes for display memory
-    std::array<uint8_t, 64 * 32> display_buffer;    // Graphics buffer
-    std::array<uint8_t, 16> keypad;                 // Keypad buffer
-    bool drawFlag;                                  // Flag to indicate the screen state
-
-    State currentState = State::RUNNING;
-    bool awaitingKeyPress = false;
-
-    bool LoadROM(const std::string &filename);
-    void EmulateCycle();
-
-    
-private:
     // Memory (4096 bytes)
-    std::array<uint8_t, 4096> memory;               // 4KB of memory
+    std::array<uint8_t, 4096> memory = {};              // 4KB of memory
     
     // Program Counter
-    uint16_t program_counter;                       // 16-bit register
+    uint16_t program_counter;                           // 16-bit register
 
     // Address Register
-    uint16_t I;                                     // Index Register (12-bits)
+    uint16_t I;                                         // Index Register (12-bits)
 
     // The Stack
-    std::array<uint8_t, 16> stack;
+    std::array<uint8_t, 16> stack = {};
     uint16_t stack_pointer;
     
     // Timers
@@ -73,9 +74,9 @@ private:
     uint8_t sound_timer;
 
     // Registers
-    std::array<uint8_t, 8> V;                      // 16 8-bit registers
+    std::array<uint8_t, 8> V = {};                      // 16 8-bit registers
 
-    uint16_t opcode;                                // 16-bit opcode
+    uint16_t opcode;                                    // 16-bit opcode (not needed but a quality of life thing)
 
 
     // MASKS

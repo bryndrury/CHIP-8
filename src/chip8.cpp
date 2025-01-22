@@ -9,6 +9,7 @@ Chip8::Chip8()
 
     // Clear graphics buffer
     OP_0NNN();
+    drawFlag = false;
 
     // Clear stack, keypad, V registers, memory
     stack.fill(0);
@@ -50,8 +51,8 @@ void Chip8::EmulateCycle()
     // As the opcode will be two bytes shift by another 8 bits
     opcode = memory[program_counter] << 8 | memory[program_counter + 1] ;
 
-    std::cout << program_counter << std::endl;
-    std::cout << opcode << std::endl;
+    // std::cout << program_counter << std::endl;
+    // std::cout << opcode << std::endl;
 
     switch (opcode)
     {
@@ -164,34 +165,30 @@ void Chip8::EmulateCycle()
         std::cout << "Invalid Opcode\n"; 
         break;
     }
-
+    sound_timer = 1;
+    
     // Manage Timers
     if (delay_timer > 0) --delay_timer;     // Decrement delay timer (if zero stop)
     if (sound_timer > 0)
     {
         if (sound_timer == 1)
         {
-            // Pass sound to SDL (i.e. set flag / edit buffer)
-            --sound_timer;
+            soundFlag = true;
         }
+        --sound_timer;
     }
 }
 
 void Chip8::OP_0NNN()
 {
-    // Do nothing
-    // std::cout << "\n\n================================\n";
-    // std::cout << "Hi there,  you shouldn't be here!\n\n";
-    // std::cout << "How  did  you  get  this  opcode?\n";
-    // std::cout << "================================\n\n";
-
-    program_counter += 5;
+    // std::cout << "Hi there, you shouldn't be here!\n\n";
+    program_counter += 2;
 }
 
 void Chip8::OP_00E0() // Clear the display buffer
 {
     display_buffer.fill(0);
-
+    drawFlag = true;
     program_counter += 2;
 }
 
@@ -371,6 +368,8 @@ void Chip8::OP_DXYN() // Draw Sprite at (VX, VY)
             display_buffer[x + x_line + ((y + y_line) * 64)] ^= 1;
         }
     }
+
+    drawFlag = true;
     program_counter += 2;
 }
 
